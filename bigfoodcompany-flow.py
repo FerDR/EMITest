@@ -51,7 +51,7 @@ def getFlow():
 
     preguntaInterest = Question(
         index="interest",
-        text="Antes que nada dime que te parece la vacante a la que te postulaste:\n\nEl auxiliar de almacén colabora en el almacenaje de productos perecederos, el armado de pedidos, orden y limpieza del almacén, entre otras cosas.\nSe trabaja 6 días por semana, con 1 de descanso, en tres turnos rolados.\nEl puesto cuenta con un atractivo sueldo base y prestaciones superiores a las de la ley.",
+        text="Antes que nada dime que te parece la vacante a la que te postulaste:\n\nEl auxiliar de almacén colabora en el almacenaje de productos perecederos, el armado de pedidos, orden y limpieza del almacén, entre otras cosas.\nSe trabaja 6 días por semana, con 1 de descanso, en tres turnos rolados.\nEl puesto cuenta con un sueldo mensual que ronda entre $5000 y $7000 pesos y prestaciones superiores a las de la ley.",
         options = ["Me interesa","+ info","No me interesa"],
         ).get_dict()
 
@@ -65,7 +65,16 @@ def getFlow():
     preguntaNoInterest = Question(
         index="no_interest",
         text = "Entiendo. No hay problema! Si en algún momento cambias de opinión me puedes esrcibir nuevamente. Adiós!",
-        immediateNext = True,
+        options = ["Hola"],
+        exactMatch = False,
+        #immediateNext = True,
+    ).get_dict()
+
+    preguntaDataStorage = Question(
+            index="data_storage",
+            text = "Todas tus respuestas serán recolectadas y entregadas al equipo de Recursos Humanos de BigFoodCompany. ¿Estás de acuerdo?",
+            options = ["Estoy de acuerdo", "No estoy de acuerdo"],
+            exactMatch = False,
     ).get_dict()
 
     preguntaInterestBye = Question(
@@ -89,12 +98,14 @@ def getFlow():
 
     preguntaIntro["question"]["connections"].append({'goto':preguntaNoInterest["question"]["index"], 'isString': "No me interesa"})
     preguntaInterest["question"]["connections"].append({'goto':preguntaNoInterest["question"]["index"], 'isString': "No me interesa"})
-    preguntaInterest["question"]["connections"].append({'goto':preguntaInterestBye["question"]["index"], 'isDefault': True})
+    preguntaInterest["question"]["connections"].append({'goto':preguntaDataStorage["question"]["index"], 'isDefault': True})
     preguntaQuienEsEmi["question"]["connections"].append({'goto':preguntaNoInterest["question"]["index"], 'isString': "No me interesa"})
     preguntaSosUnRobot["question"]["connections"].append({'goto':preguntaNoInterest["question"]["index"], 'isString': "No me interesa"})
-    preguntaMoreInfo["question"]["connections"].append({'goto':preguntaInterestBye["question"]["index"], 'isDefault': True})
+    preguntaMoreInfo["question"]["connections"].append({'goto':preguntaDataStorage["question"]["index"], 'isDefault': True})
     preguntaMoreInfo["question"]["connections"].append({'goto':preguntaNoInterest["question"]["index"], 'isString': "No me interesa"})
-
+    preguntaDataStorage["question"]["connections"].append({'goto':preguntaInterestBye["question"]["index"], 'isString': "Estoy de acuerdo"})
+    preguntaDataStorage["question"]["connections"].append({'goto':preguntaNoInterest["question"]["index"], 'isString': "No estoy de acuerdo"})
+    preguntaNoInterest["question"]["connections"].append({'goto':preguntaIntro["question"]["index"], 'isString': "Hola"})
 
     # Armado de set de schedule
     flow["current"] = preguntaIntro["question"]["index"]
@@ -105,6 +116,7 @@ def getFlow():
     flow[preguntaMoreInfo["question"]["index"]] = preguntaMoreInfo
     flow[preguntaNoInterest["question"]["index"]] = preguntaNoInterest
     flow[preguntaInterestBye["question"]["index"]] = preguntaInterestBye
+    flow[preguntaDataStorage["question"]["index"]] = preguntaDataStorage
 
     return flow
 
